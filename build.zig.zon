@@ -1,0 +1,12 @@
+.{
+    .name = .blindrsa,
+    .version = "0.0.1",
+    .dependencies = .{
+        .blind_rsa_signatures = .{
+            .url = "https://github.com/jedisct1/zig-blind-rsa-signatures/archive/refs/heads/main.tar.gz",
+            .hash = "blind_rsa_signatures-0.0.0-47ORh-AmAgAirsGk4jfiplANruN7B7SCQEUVZ36OmJp_",
+        },
+    },
+    .paths = .{""},
+    .fingerprint = 0x6f956e11098d66f5,
+}
