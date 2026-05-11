@@ -57,12 +57,10 @@ pub export fn pk_blind(
     msg_len: usize,
     blinded: *[256]u8,
     secret: *[256]u8,
-    // msg_randomizer: *[32]u8,
 ) ?ErrorName {
     const blinding_result = pk.blind(msg[0..msg_len]) catch |err| return @errorName(err);
     blinded.* = blinding_result.blind_message;
     secret.* = blinding_result.secret;
-    // msg_randomizer.* = blinding_result.msg_randomizer;
     return null;
 }
 
@@ -71,7 +69,6 @@ pub export fn pk_finalize(
     signed: *[256]u8,
     blinded: *[256]u8,
     secret: *[256]u8,
-    // msg_randomizer: *[32]u8,
     msg: [*]u8,
     msg_len: usize,
     signature: *[256]u8,
@@ -81,7 +78,7 @@ pub export fn pk_finalize(
         &blindrsa.BlindingResult{
             .blind_message = blinded.*,
             .secret = secret.*,
-            .msg_randomizer = null, //msg_randomizer.*,
+            .msg_randomizer = null,
         },
         msg[0..msg_len],
     ) catch |err| return @errorName(err);
@@ -91,13 +88,12 @@ pub export fn pk_finalize(
 pub export fn pk_verify(
     pk: *PublicKey,
     signature: *[256]u8,
-    // msg_randomizer: *[32]u8,
     msg: [*]u8,
     msg_len: usize,
 ) ?ErrorName {
     pk.verify(
         signature.*,
-        null, // msg_randomizer.*,
+        null,
         msg[0..msg_len],
     ) catch |err| return @errorName(err);
     return null;

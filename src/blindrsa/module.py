@@ -80,7 +80,6 @@ class PublicKey:
     def blind(self, msg: bytes) -> tuple[bytes, bytes]:
         blinded_msg = bytearray(256)
         secret = bytearray(256)
-        # msg_randomizer = bytearray(32)
         exports.assert_fn("pk_blind(*PublicKey, [*]const u8, usize, *[256]u8, *[256]u8) ?[*:0]const u8")
         _lib.pk_blind.restype = zig.c_char_p
         if err := _lib.pk_blind(
@@ -89,23 +88,20 @@ class PublicKey:
             zig.usize(len(msg)),
             zig.pointer_to_bytearray(blinded_msg),
             zig.pointer_to_bytearray(secret),
-            # zig.pointer_to_bytearray(msg_randomizer),
         ):
             raise zig.ZigError(err)
-        return bytes(blinded_msg), bytes(secret)  # ,bytes(msg_randomizer)
+        return bytes(blinded_msg), bytes(secret)
 
     def finalize(
         self,
         signed: bytes,
         blinded: bytes,
         secret: bytes,
-        # msg_randomizer: bytes,
         msg: bytes,
     ) -> bytes:
         assert len(signed) == 256
         assert len(blinded) == 256
         assert len(secret) == 256
-        # assert len(msg_randomizer) == 32
         signature = bytearray(256)
         exports.assert_fn(
             "pk_finalize(*PublicKey, *[256]u8, *[256]u8, *[256]u8, [*]u8, usize, *[256]u8) ?[*:0]const u8"
@@ -116,7 +112,6 @@ class PublicKey:
             zig.pointer_to_bytes(signed),
             zig.pointer_to_bytes(blinded),
             zig.pointer_to_bytes(secret),
-            # zig.pointer_to_bytes(msg_randomizer),
             zig.pointer_to_bytes(msg),
             zig.usize(len(msg)),
             zig.pointer_to_bytearray(signature),
@@ -127,17 +122,14 @@ class PublicKey:
     def verify(
         self,
         signature: bytes,
-        # msg_randomizer: bytes,
         msg: bytes,
     ) -> None:
         assert len(signature) == 256
-        # assert len(msg_randomizer) == 32
         exports.assert_fn("pk_verify(*PublicKey, *[256]u8, [*]u8, usize) ?[*:0]const u8")
         _lib.pk_verify.restype = zig.c_char_p
         if err := _lib.pk_verify(
             zig.pointer(self._ptr),
             zig.pointer_to_bytes(signature),
-            # zig.pointer_to_bytes(msg_randomizer),
             zig.pointer_to_bytes(msg),
             zig.usize(len(msg)),
         ):
