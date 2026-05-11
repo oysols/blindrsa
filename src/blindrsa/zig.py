@@ -52,16 +52,11 @@ def pointer_to_value(obj: f64 | f32 | i64 | u8 | i8 | bool | usize) -> ctypes.c_
 
 class ZigError(Exception):
     """Zig @errorName(err) propagated to python
-    Usage:
-
     zig:
-
         fn myfunc() ?[*:0]const u8 {
             maybe_something() catch |err| return @errorName(err)
         }
-
     python:
-
         _lib.myfunc.restype = ctypes.c_char_p
         if err := _lib.myfunc():
             raise zig.ZigError(err)
@@ -72,33 +67,8 @@ class ZigError(Exception):
 
 
 class ZigExports:
-    """Function signature contract between zig and python
-    zig:
-
-        export const exports: [*:0]const u8 = blk: {
-            var str: []const u8 = "";
-            for (@typeInfo(@This()).@"struct".decls) |decl| {
-                const function_name = decl.name;
-                const field = @field(@This(), decl.name);
-                if (@typeInfo(@TypeOf(field)) != .@"fn") continue;
-                const fn_info = @typeInfo(@TypeOf(field)).@"fn";
-                const return_type_name = @typeName(fn_info.return_type.?);
-                str = str ++ function_name ++ "(";
-                for (fn_info.params, 0..) |p, i| {
-                    if (i != 0) {
-                        str = str ++ ", ";
-                    }
-                    const param_type_name = @typeName(p.type.?);
-                    str = str ++ param_type_name;
-                }
-                str = str ++ ") " ++ return_type_name ++ "\n";
-            }
-            break :blk str ++ "\x00";
-        };
-    """
-
     def __init__(self, dll: ctypes.CDLL, exported_string_name: str, strip: list[str]) -> None:
-        """Read explicitly created c_string containing lib fn exports"""
+        """Read explicitly created c_string containing lib function exports"""
         self.exports: list[str] = []
         for export in (ctypes.c_char_p.in_dll(dll, exported_string_name).value or b"").decode().splitlines():
             for strip_str in strip:
