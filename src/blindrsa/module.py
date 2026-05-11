@@ -31,7 +31,7 @@ def generate_keypair() -> tuple[bytes, bytes]:
 
 class SecretKey:
     def __init__(self, sk_der: bytes) -> None:
-        exports.assert_fn("sk_init([*]u8, usize) ?*SecretKey")
+        exports.assert_fn("sk_init([*]const u8, usize) ?*SecretKey")
         _lib.sk_init.restype = zig.pointer
         self._ptr = _lib.sk_init(
             zig.pointer_to_bytes(sk_der),
@@ -62,7 +62,7 @@ class SecretKey:
 
 class PublicKey:
     def __init__(self, pk_der: bytes) -> None:
-        exports.assert_fn("pk_init([*]u8, usize) ?*PublicKey")
+        exports.assert_fn("pk_init([*]const u8, usize) ?*PublicKey")
         _lib.pk_init.restype = zig.pointer
         self._ptr = _lib.pk_init(
             zig.pointer_to_bytes(pk_der),
@@ -104,7 +104,7 @@ class PublicKey:
         assert len(secret) == 256
         signature = bytearray(256)
         exports.assert_fn(
-            "pk_finalize(*PublicKey, *[256]u8, *[256]u8, *[256]u8, [*]u8, usize, *[256]u8) ?[*:0]const u8"
+            "pk_finalize(*PublicKey, *const [256]u8, *const [256]u8, *const [256]u8, [*]const u8, usize, *[256]u8) ?[*:0]const u8"
         )
         _lib.pk_finalize.restype = zig.c_char_p
         if err := _lib.pk_finalize(
@@ -125,7 +125,7 @@ class PublicKey:
         msg: bytes,
     ) -> None:
         assert len(signature) == 256
-        exports.assert_fn("pk_verify(*PublicKey, *[256]u8, [*]u8, usize) ?[*:0]const u8")
+        exports.assert_fn("pk_verify(*PublicKey, *const [256]u8, [*]const u8, usize) ?[*:0]const u8")
         _lib.pk_verify.restype = zig.c_char_p
         if err := _lib.pk_verify(
             zig.pointer(self._ptr),

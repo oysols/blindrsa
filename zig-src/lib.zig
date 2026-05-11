@@ -22,7 +22,7 @@ pub export fn generate_keypair(sk: *[2048]u8, sk_len: *usize, pk: *[2048]u8, pk_
 
 // SecretKey
 
-pub export fn sk_init(sk_bytes: [*]u8, sk_len: usize) ?*SecretKey {
+pub export fn sk_init(sk_bytes: [*]const u8, sk_len: usize) ?*SecretKey {
     const sk: *SecretKey = gpa.create(SecretKey) catch return null;
     sk.* = SecretKey.import(sk_bytes[0..sk_len]) catch return null;
     return sk;
@@ -40,7 +40,7 @@ pub export fn sk_sign(sk: *SecretKey, msg: *const [256]u8, signed: *[256]u8) ?Er
 
 // PublicKey
 
-pub export fn pk_init(pk_bytes: [*]u8, pk_len: usize) ?*PublicKey {
+pub export fn pk_init(pk_bytes: [*]const u8, pk_len: usize) ?*PublicKey {
     const pk: *PublicKey = gpa.create(PublicKey) catch return null;
     pk.* = PublicKey.import(pk_bytes[0..pk_len]) catch return null;
     return pk;
@@ -66,10 +66,10 @@ pub export fn pk_blind(
 
 pub export fn pk_finalize(
     pk: *PublicKey,
-    signed: *[256]u8,
-    blinded: *[256]u8,
-    secret: *[256]u8,
-    msg: [*]u8,
+    signed: *const [256]u8,
+    blinded: *const [256]u8,
+    secret: *const [256]u8,
+    msg: [*]const u8,
     msg_len: usize,
     signature: *[256]u8,
 ) ?ErrorName {
@@ -87,8 +87,8 @@ pub export fn pk_finalize(
 
 pub export fn pk_verify(
     pk: *PublicKey,
-    signature: *[256]u8,
-    msg: [*]u8,
+    signature: *const [256]u8,
+    msg: [*]const u8,
     msg_len: usize,
 ) ?ErrorName {
     pk.verify(
