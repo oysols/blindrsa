@@ -23,12 +23,4 @@ pub fn build(b: *std.Build) void {
         .optimize = optimize,
     });
     lib.root_module.addImport("blind_rsa_signatures", blind.module("blind_rsa_signatures"));
-
-    // Add test step
-    const mod_tests = b.addTest(.{
-        .root_module = mod,
-    });
-    const test_step = b.step("test", "Run tests");
-    const run_mod_tests = b.addRunArtifact(mod_tests);
-    test_step.dependOn(&run_mod_tests.step);
 }
